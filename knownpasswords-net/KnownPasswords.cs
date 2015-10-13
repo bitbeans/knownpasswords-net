@@ -39,13 +39,12 @@ namespace knownpasswords
         /// <exception cref="NotSupportedException"></exception>
         public KnownPasswords(string clientPrivateKey)
         {
-            var curve25519SecretKey =
-                PublicKeyAuth.ConvertEd25519SecretKeyToCurve25519SecretKey(Utilities.HexToBinary(clientPrivateKey));
             SignaurKeyPair =
                 new KeyPair(
                     PublicKeyAuth.ExtractEd25519PublicKeyFromEd25519SecretKey(Utilities.HexToBinary(clientPrivateKey)),
                     Utilities.HexToBinary(clientPrivateKey));
-            EncryptionKeyPair = PublicKeyBox.GenerateKeyPair(curve25519SecretKey);
+
+            EncryptionKeyPair = PublicKeyBox.GenerateKeyPair();
 
             // the API only accepts TLS 1.2 connections
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -155,17 +154,16 @@ namespace knownpasswords
             return new ApiInformationResponse();
         }
 
-        private static EncryptedRequest EncryptCheckPasswordRequest(CheckPasswordRequest checkPasswordRequest)
+        private EncryptedRequest EncryptCheckPasswordRequest(CheckPasswordRequest checkPasswordRequest)
         {
             var encryptedRequest = new EncryptedRequest();
             try
             {
                 var clearText = SimpleJson.SerializeObject(checkPasswordRequest);
                 var nonce = PublicKeyBox.GenerateNonce();
-                var ephemeralKeyPair = PublicKeyBox.GenerateKeyPair();
-                var cipher = PublicKeyBox.Create(Encoding.UTF8.GetBytes(clearText), nonce, ephemeralKeyPair.PrivateKey,
+                var cipher = PublicKeyBox.Create(Encoding.UTF8.GetBytes(clearText), nonce, EncryptionKeyPair.PrivateKey,
                     Utilities.HexToBinary(ServerEncryptionPublicKeyHex));
-                encryptedRequest.PublicKey = Utilities.BinaryToHex(ephemeralKeyPair.PublicKey);
+                encryptedRequest.PublicKey = Utilities.BinaryToHex(EncryptionKeyPair.PublicKey);
                 encryptedRequest.Ciphertext = Utilities.BinaryToHex(cipher);
                 encryptedRequest.Nonce = Utilities.BinaryToHex(nonce);
             }

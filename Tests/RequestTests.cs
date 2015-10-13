@@ -10,7 +10,7 @@ namespace Tests
         private readonly string _clientPrivateKey;
         public RequestTests()
         {
-            _clientPrivateKey = "<private key>";
+            _clientPrivateKey = "<your private key>";
         }
         [Test]
         public void CheckPasswordClearText()
