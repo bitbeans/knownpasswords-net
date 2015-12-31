@@ -1,7 +1,7 @@
 MIT License
 ===========
 
-Copyright (c) 2015 Christian Hermann <c.hermann@bitbeans.de>
+Copyright (c) 2015 - 2016 Christian Hermann <c.hermann@bitbeans.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
